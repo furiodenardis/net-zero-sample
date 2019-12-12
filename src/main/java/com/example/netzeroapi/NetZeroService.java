@@ -33,7 +33,7 @@ public class NetZeroService {
         return (String) responseMap.get("id");
     }
 
-    static void carbonEstimate(final String apiKey)  throws JsonProcessingException {
+    static String carbonEstimate(final String apiKey)  throws JsonProcessingException {
         final String uri = "https://api.net-zero.earth/v1/estimates/create-carbon";
         final RestTemplate restTemplate = new RestTemplate();
 
@@ -49,19 +49,29 @@ public class NetZeroService {
         headers.setBearerAuth(apiKey);
 
         final HttpEntity request = new HttpEntity(postBody, headers);
-        String result = restTemplate.postForObject(uri, request, String.class, headers);
-        System.out.println(result);
+        String response = restTemplate.postForObject(uri, request, String.class, headers);
+        System.out.println(response);
+
+        Gson gson = new Gson();
+        Map responseMap = gson.fromJson(response, Map.class);
+        return (String) responseMap.get("id");
     }
 
     static void listEstimates(final String apiKey) {
-        final String uri = "https://api.net-zero.earth/v1/estimates/";
+        final String uri = "https://api.net-zero.earth/v1/estimates";
         final RestTemplate restTemplate = new RestTemplate();
 
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        final String result = restTemplate.getForObject(uri, String.class, headers);
+        final HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> response =
+                restTemplate.exchange(
+                uri, HttpMethod.GET, request, String.class);
+
+        final String result = response.getBody();
         System.out.println(result);
     }
 
@@ -73,7 +83,12 @@ public class NetZeroService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        final String result = restTemplate.getForObject(uri, String.class, headers);
+        final HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> response =
+                restTemplate.exchange(
+                        uri, HttpMethod.GET, request, String.class);
+        final String result = response.getBody();
         System.out.println(result);
     }
 
@@ -85,7 +100,12 @@ public class NetZeroService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        final String result = restTemplate.getForObject(uri, String.class, headers);
+        final HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> response =
+                restTemplate.exchange(
+                        uri, HttpMethod.GET, request, String.class);
+        final String result = response.getBody();
         System.out.println(result);
     }
 
@@ -134,7 +154,12 @@ public class NetZeroService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        final String result = restTemplate.getForObject(uri, String.class, headers);
+        final HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> response =
+                restTemplate.exchange(
+                        uri, HttpMethod.GET, request, String.class);
+        final String result = response.getBody();
         System.out.println(result);
     }
 
@@ -146,21 +171,26 @@ public class NetZeroService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        final String result = restTemplate.getForObject(uri, String.class, headers);
+        final HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> response =
+                restTemplate.exchange(
+                        uri, HttpMethod.GET, request, String.class);
+        final String result = response.getBody();
         System.out.println(result);
     }
 
     public static void main(String[] args) throws JsonProcessingException {
         String apiKey = "api-key:supsgsh1qugqlirjb14sob7se543pc878imrqamgfnsknogomj0y4jm4srm2q3c7";
-        final String estimateId = fixedEstimate(apiKey);
-        carbonEstimate(apiKey);
-//        listEstimates(apiKey);
-//        retrieveEstimate(apiKey, estimateId);
-        estimateToPurchase(apiKey, estimateId);
-        cancelEstimate(apiKey, estimateId);
+        final String fixedEstimateId = fixedEstimate(apiKey);
+        final String carbonEstimateId = carbonEstimate(apiKey);
+        listEstimates(apiKey);
+        retrieveEstimate(apiKey, carbonEstimateId);
+        estimateToPurchase(apiKey, carbonEstimateId);
+        cancelEstimate(apiKey, fixedEstimateId);
         final String purchaseId = fixedPurchase(apiKey);
         listPurchases(apiKey);
-//        retrievePurchase(apiKey);
+        retrievePurchase(apiKey, purchaseId);
     }
 
 }
